@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: asimpletestrule
+  namespace: kommander
+  labels:
+    prometheus.kommander.d2iq.io/select: 'true'
+    release: kube-prometheus-stack
+spec:
+  groups:
+  - name: test.rules
+    rules:
+    - alert: ASimpleTestRule
+      expr: vector(2) > vector(1)
+      for: 1m
+      labels:
+        severity: info
+      annotations:
+        summary: "A problem has been detected"
+        description: "It's not really a problem, just testing it out"

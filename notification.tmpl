@@ -1,0 +1,96 @@
+{{ define "email.default.subject" }}
+{{ if eq .Status "firing" }}
+[{{ .Status | toUpper }}] Alert: {{ .Labels.alertname }} on {{ .Labels.service }}
+{{ else }}
+[RESOLVED] Alert: {{ .Labels.alertname }} on {{ .Labels.service }}
+{{ end }}
+{{ end }}
+
+{{ define "email.default.html" }}
+{{ if eq .Status "firing" }}
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+    }
+    .container {
+      padding: 20px;
+      background-color: white;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background-color: #f44336;
+      color: white;
+      padding: 10px;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+    .content {
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Alert: {{ .Labels.alertname }}</h2>
+    </div>
+    <div class="content">
+      <p><strong>Service:</strong> {{ .Labels.service }}</p>
+      <p><strong>Severity:</strong> {{ .Labels.severity }}</p>
+      <p><strong>Summary:</strong> {{ .Annotations.summary }}</p>
+      <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+      <p><strong>Additional Info:</strong> {{ .Annotations.additional_info }}</p>
+    </div>
+  </div>
+</body>
+</html>
+{{ else }}
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+    }
+    .container {
+      padding: 20px;
+      background-color: white;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+    .content {
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Alert Resolved: {{ .Labels.alertname }}</h2>
+    </div>
+    <div class="content">
+      <p><strong>Service:</strong> {{ .Labels.service }}</p>
+      <p>The alert has been resolved.</p>
+    </div>
+  </div>
+</body>
+</html>
+{{ end }}
+{{ end }}

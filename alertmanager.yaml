@@ -1,0 +1,30 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'my-alerter@gmail.com'
+  smtp_auth_username: 'burnerdavehome1@gmail.com'
+  smtp_auth_password: <REDACTED>
+  smtp_require_tls: true
+
+templates:
+- '*.tmpl'
+
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 30s
+  repeat_interval: 15m
+  receiver: email_env
+
+inhibit_rules:
+- source_matchers: [ severity="critical" ]
+  target_matchers: [ severity="warning" ]
+  equal: [ alertname ]
+
+receivers:
+- name: 'email_env'
+  email_configs:
+    - send_resolved: true
+      to: 'dave@davewhitehouse.co.uk'
+      headers:
+        subject: '{{ template "email.default.subject" . }}'
+        html: '{{ template "email.default.html" . }}'
