@@ -33,4 +33,18 @@
     --from-file=notification.tmpl
     ```
 
-5. Delete the alertmanager pod to reload the configuration.
+5. The prometheus dashboard, by this stage, should show the alert to be firing:
+
+    ![firing](assets/prometh_firing.png)
+
+6. Delete the alertmanager pod to reload the configuration.
+
+    ```bash
+    kubectl delete po -n kommander alertmanager-kube-prometheus-stack-alertmanager-0
+    ```
+
+7. Inspect the alertmanager logs to troubleshoot the smtp side.
+
+    ```bash
+    kubectl logs -f -n kommander alertmanager-kube-prometheus-stack-alertmanager-0
+    ```

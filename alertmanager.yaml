@@ -1,8 +1,8 @@
 global:
-  smtp_smarthost: 'smtp.gmail.com:587'
-  smtp_from: 'my-alerter@gmail.com'
-  smtp_auth_username: 'burnerdavehome1@gmail.com'
-  smtp_auth_password: <REDACTED>
+  smtp_smarthost: 'smtp.example.com:465'
+  smtp_from: 'my-alerter@example.com'
+  smtp_auth_username: 'username@example.com'
+  smtp_auth_password: 'my_crap_password'
   smtp_require_tls: true
 
 templates:
@@ -24,7 +24,7 @@ receivers:
 - name: 'email_env'
   email_configs:
     - send_resolved: true
-      to: 'dave@davewhitehouse.co.uk'
+      to: 'recipient@example.com'
       headers:
         subject: '{{ template "email.default.subject" . }}'
         html: '{{ template "email.default.html" . }}'
