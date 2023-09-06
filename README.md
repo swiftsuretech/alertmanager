@@ -49,7 +49,7 @@
     kubectl logs -f -n kommander alertmanager-kube-prometheus-stack-alertmanager-0
     ```
 
-Using TLS authentication for your SMTP server
+## Using TLS authentication for your SMTP server
 
 8. Generate a kubernetes secret with your certificates. If this secret already exists then check to ensure that it is empty. Always back up the file to your local machine.
 
