@@ -57,7 +57,8 @@
     kubectl create secret generic -n kommander \
     alertmanager-kube-prometheus-stack-alertmanager-tls-assets-0 \
     --from-file=tls.crt=path/to/your/tls.crt \
-    --from-file=tls.key=path/to/your/tls.key
+    --from-file=tls.key=path/to/your/tls.key \
+    --from-file=tls.crt-path/to/your/ca.crt
     ```
 
 9. Inspect the StatefulSet called "alertmanager-kube-prometheus-stack-alertmanager" in the "kommander" namespace. It should already define a volume called "tls-assets" which it mounts at "/etc/alertmanager/certs"
@@ -69,7 +70,7 @@
         - name: 'email'
           email_configs:
           - to: 'your@email.com'
-            tls_ca: /etc/alertmanager/certs/tls.crt
+            tls_ca: /etc/alertmanager/certs/ca.crt
             tls_cert: /etc/alertmanager/certs/tls.crt
             tls_key: /etc/alertmanager/certs/tls.key
     ```
