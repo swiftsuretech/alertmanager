@@ -55,30 +55,64 @@
 
     ```yaml
     kubectl create secret generic -n kommander \
-    alertmanager-kube-prometheus-stack-alertmanager-tls-assets-0 \
-    --from-file=tls.crt=path/to/your/tls.crt \
+    my-tls-secrets \
+    --from-file=ca.crt=path/to/your/ca.crt \
     --from-file=tls.key=path/to/your/tls.key \
-    --from-file=tls.crt-path/to/your/ca.crt
+    --from-file=tls.crt-path/to/your/tls.crt
     ```
 
-9. Inspect the StatefulSet called "alertmanager-kube-prometheus-stack-alertmanager" in the "kommander" namespace. It should already define a volume called "tls-assets" which it mounts at "/etc/alertmanager/certs"
+9. Generate and create an overrides file for kube-prometheus-stack. This will generate an override for the helm release. It will mount the secret we just created into the alertmanger pods in a persistent manner.
 
-10. Update your alertmanager.yaml to add the following
+   ```yaml
+   apiVersion: v1
+   kind: ConfigMap
+   metadata:
+   name: alertmanager-overrides
+   namespace: kommander
+   data:
+   values.yaml: |
+       ---
+       alertmanager:
+       alertmanagerSpec:
+         secrets:
+         - my-tls-secrets
+   ```
+
+10. Update the AppDeployment to apply the overrides:
+
+    ```yaml
+    dkp edit appdeployment -n kommander kube-prometheus-stack
+    ```
+
+    Ensuring that the following field is added to the manifest:
+
+    ```yaml
+    spec:
+      configOverrides:
+        name: kube-prometheus-stack-overrides
+    ```
+
+
+11. Update your alertmanager.yaml to add the following
 
     ```yaml
         receivers:
         - name: 'email'
           email_configs:
           - to: 'your@email.com'
-            tls_ca: /etc/alertmanager/certs/ca.crt
-            tls_cert: /etc/alertmanager/certs/tls.crt
-            tls_key: /etc/alertmanager/certs/tls.key
+            tls_ca: /etc/alertmanager/secrets/my-tls-secrets/ca.crt
+            tls_cert: /etc/alertmanager/secrets/my-tls-secrets/tls.crt
+            tls_key: /etc/alertmanager/secrets/my-tls-secrets/tls.key
     ```
 
-11. Delete the alertmanager pod to reload the configuration.
+12. Observe the helm-release status. There should shortly be an upgrade
 
     ```bash
-    kubectl delete po -n kommander alertmanager-kube-prometheus-stack-alertmanager-0
+     kubectl describe hr -n kommander kube-prometheus-stack        
     ```
 
-12. Inspect the new pod. The certificate information should be mounted correctly and available to prometheus for SMTP authentication.
+13. Inspect the new pod. If it is not automatically restarted following successful helm release update then delete it. The certificate information should be mounted correctly and available to prometheus for SMTP authentication. The following command will confirm that the secrets are available in the pod:
+
+    ```bash
+    kubectl exec -n kommander alertmanager-kube-prometheus-stack-alertmanager-0 -- ls -alh /etc/alertmanager/secrets/my-tls-secrets/
+    ```
